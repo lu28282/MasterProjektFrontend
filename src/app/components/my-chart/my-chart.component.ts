@@ -1,22 +1,38 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Chart } from 'chart.js';
 import { DomainAPIService } from 'src/app/services/API/DomainAPI/domain.service';
+import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {NgbDateStruct, NgbCalendar} from '@ng-bootstrap/ng-bootstrap';
+
 
 @Component({
   selector: 'app-my-chart',
   templateUrl: './my-chart.component.html',
   styleUrls: ['./my-chart.component.css'],
+  
 })
 export class MyChartComponent implements OnInit {
-  constructor(private domainAPIService: DomainAPIService) {
-    //this.readCsvData();
-    //   this.http.get("./assets/tld2.csv", { responseType: 'text' as 'json'})
-    //  .subscribe(data => {this.response=data;});
+  idomains: import("d:/LernProjekt/MasterProjektFrontend/src/app/interfaces/domains").IDomains[];
+  titel: String;
+ 
+  date: {year: number, month: number};
 
+  constructor(private domainAPIService: DomainAPIService, config: NgbModalConfig, private modalService: NgbModal, private calendar: NgbCalendar) {
+    config.backdrop = 'static';
+    config.keyboard = false;
+  
     this.domainAPIService.getDomains();
+  
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    setTimeout(() => {
+      
+      // console.log(this.domainAPIService.getMyTest());
+      this.idomains = this.domainAPIService.getDomains();
+    }, 500);
+    
+  }
 
   canvas: any;
   ctx: any;
@@ -70,4 +86,19 @@ export class MyChartComponent implements OnInit {
     ctx.data.labels = ['1', '2', '3', '4', '5'];
     ctx.update();
   }
+
+  onClick(event, content) {
+    var target = event.target || event.srcElement || event.currentTarget;
+    var idAttr = target.attributes.id;
+    var value = idAttr.nodeValue;
+    var country= event.srcElement.innerText;
+    this.titel=country;
+    this.modalService.open(content);
+    
+    console.log(event.srcElement.innerText);
+    //console.log(event.srcElement.firstChild);
+    
+  }
+
+  
 }

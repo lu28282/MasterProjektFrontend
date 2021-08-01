@@ -14,11 +14,10 @@
 
 
             <li class="dropdown-submenu"><a class="dropdown-item" href="#">Land</a>
-                <ul class="dropdown-menu">
-                    <li class="dropdown-item"><a href="#">4th level</a></li>
-                    <li class="dropdown-item"><a href="#">4th level</a></li>
-                    <li class="dropdown-item"><a href="#">4th level</a></li>
+                <ul class="dropdown-menu scrollable-menu" *ngIf="idomains">
+                    <li *ngFor="let item of idomains" class="dropdown-item" (click)="onClick($event, content)"><a id={{item.domain}} href="#" data-toggle="modal" data-target="#modal1">{{item.land}}</a></li>
                 </ul>
+
             </li>
 
             <li class="dropdown-submenu"><a class="dropdown-item" href="#">Schwere der Lücke</a>
@@ -43,3 +42,20 @@
 <div style="width:100%;">
     <canvas id="myChart" width="700" height="250" #mychart></canvas>
 </div>
+
+<ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">{{titel}}</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <!-- <p>Hello, World!</p> -->
+        <ngb-datepicker #dp></ngb-datepicker>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" (click)="c('Save click')">Save</button>
+    </div>
+</ng-template>
