@@ -58,14 +58,10 @@
     overflow-x: hidden;
 }
 
-.ngb-dp-months {
+::ng-deep .ngb-dp-months {
     display: none !important;
 }
 
-.ngb-dp-content ngb-dp-months {
-    display: none !important;
-}
-
-.ngb-dp-content {
-    display: none !important;
+::ng-deep .ngb-dp-header {
+    width: 130%;
 }

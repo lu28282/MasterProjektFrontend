@@ -1,37 +1,50 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnInit, ViewChild } from '@angular/core';
 import { Chart } from 'chart.js';
 import { DomainAPIService } from 'src/app/services/API/DomainAPI/domain.service';
-import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import {NgbDateStruct, NgbCalendar} from '@ng-bootstrap/ng-bootstrap';
-
+import {
+  NgbModalConfig,
+  NgbModal,
+  NgbDateStruct,
+  NgbDate,
+  NgbDatepickerNavigateEvent,
+} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-my-chart',
   templateUrl: './my-chart.component.html',
   styleUrls: ['./my-chart.component.css'],
-  
 })
 export class MyChartComponent implements OnInit {
-  idomains: import("d:/LernProjekt/MasterProjektFrontend/src/app/interfaces/domains").IDomains[];
+  idomains: import('d:/LernProjekt/MasterProjektFrontend/src/app/interfaces/domains').IDomains[];
   titel: String;
- 
-  date: {year: number, month: number};
+  startFromDate:Date;
+  startFromDateString:String;
+  minToDate:Date;
+  minToDateString:String;
+  startDateFrom: Date;
+  countryCode: String;
 
-  constructor(private domainAPIService: DomainAPIService, config: NgbModalConfig, private modalService: NgbModal, private calendar: NgbCalendar) {
+  minDate = { year: 2015, month: 1, day: 1 };
+  startDate = { year: 2015, month: 1, day: 1,};
+  selectedDate: NgbDate;
+
+  dateSelect = new EventEmitter<NgbDateStruct>();
+  constructor(
+    private domainAPIService: DomainAPIService,
+    config: NgbModalConfig,
+    private modalService: NgbModal
+  ) {
     config.backdrop = 'static';
     config.keyboard = false;
-  
+
     this.domainAPIService.getDomains();
-  
   }
 
   ngOnInit(): void {
     setTimeout(() => {
-      
       // console.log(this.domainAPIService.getMyTest());
       this.idomains = this.domainAPIService.getDomains();
     }, 500);
-    
   }
 
   canvas: any;
@@ -87,18 +100,57 @@ export class MyChartComponent implements OnInit {
     ctx.update();
   }
 
-  onClick(event, content) {
+  openCountry(event, content) {
     var target = event.target || event.srcElement || event.currentTarget;
+
+    //Get the ID of a
     var idAttr = target.attributes.id;
+
+    //Get domains
     var value = idAttr.nodeValue;
-    var country= event.srcElement.innerText;
-    this.titel=country;
+
+    this.countryCode=value;
+
+    var country = event.srcElement.innerText;
+    this.titel = country;
     this.modalService.open(content);
+  }
+
+  sendToBackend() {
+
+    if(this.startFromDate.getTime()<=this.minToDate.getTime()){
+      console.log(this.startFromDateString+"&"+this.minToDateString+"&"+"countrycode="+this.countryCode);
+      this.modalService.dismissAll('Dismissed after saving data');
+    }
+   
+  }
+
+
+  dateNavigateFrom($event: NgbDatepickerNavigateEvent) {
+    this.startFromDate=new Date($event.next.year,$event.next.month-1);
+   
+   
+    if(($event.next.month)<10){
+      this.startFromDateString="?startdate="+this.startFromDate.getFullYear()+"0"+($event.next.month).toString();
+    }else{
+      this.startFromDateString="?startdate="+this.startFromDate.getFullYear()+($event.next.month).toString();
+    }
+     
     
-    console.log(event.srcElement.innerText);
-    //console.log(event.srcElement.firstChild);
+  }
+  dateNavigateTo($event: NgbDatepickerNavigateEvent) {
+    this.minToDate=new Date($event.next.year,$event.next.month-1);
+
+    if(($event.next.month)<10){
+      this.minToDateString="?enddate="+this.minToDate.getFullYear()+"0"+($event.next.month).toString();
+    }else{
+      this.minToDateString="?enddate="+this.minToDate.getFullYear()+($event.next.month).toString();
+    }
     
   }
 
+  compareDate(){
+    return !(this.startFromDate.getTime()<=this.minToDate.getTime());
+  }
   
 }

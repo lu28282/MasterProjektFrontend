@@ -15,7 +15,7 @@
 
             <li class="dropdown-submenu"><a class="dropdown-item" href="#">Land</a>
                 <ul class="dropdown-menu scrollable-menu" *ngIf="idomains">
-                    <li *ngFor="let item of idomains" class="dropdown-item" (click)="onClick($event, content)"><a id={{item.domain}} href="#" data-toggle="modal" data-target="#modal1">{{item.land}}</a></li>
+                    <li *ngFor="let item of idomains" class="dropdown-item" (click)="openCountry($event, content)" id={{item.domain}}><a id={{item.domain}} href="#" data-toggle="modal" data-target="#modal1">{{item.land}}</a></li>
                 </ul>
 
             </li>
@@ -52,10 +52,21 @@
     </div>
     <div class="modal-body">
         <!-- <p>Hello, World!</p> -->
-        <ngb-datepicker #dp></ngb-datepicker>
+        <!-- <ngb-datepicker #dp [outsideDays]="outsideDays"></ngb-datepicker> -->
+        <div>
+            <h2>Von</h2>
+            <ngb-datepicker (navigate)="dateNavigateFrom($event)" [minDate]="minDate" [startDate]="startDate"></ngb-datepicker>
+        </div>
+        <div>
+            <h2>Bis</h2>
+            <ngb-datepicker [minDate]="minDate" [startDate]="startDate" (navigate)="dateNavigateTo($event)"></ngb-datepicker>
+        </div>
+
+
+
 
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-outline-dark" (click)="c('Save click')">Save</button>
+        <button type="button" class="btn btn-outline-dark" (click)="sendToBackend()" [disabled]="compareDate()">Senden</button>
     </div>
 </ng-template>
