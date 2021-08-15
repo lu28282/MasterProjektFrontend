@@ -8,6 +8,10 @@ import {
   NgbDate,
   NgbDatepickerNavigateEvent,
 } from '@ng-bootstrap/ng-bootstrap';
+import { CWEAPIService } from 'src/app/services/API/CWEAPI/cwe.service';
+import { ICWE } from 'src/app/interfaces/cwe';
+import { IDomains } from 'src/app/interfaces/domains';
+import { interval, Subscription, timer } from 'rxjs';
 
 @Component({
   selector: 'app-my-chart',
@@ -15,7 +19,8 @@ import {
   styleUrls: ['./my-chart.component.css'],
 })
 export class MyChartComponent implements OnInit {
-  idomains: import('d:/LernProjekt/MasterProjektFrontend/src/app/interfaces/domains').IDomains[];
+  idomains: IDomains[];
+  icwe: ICWE[];
   titel: String;
   startFromDate:Date;
   startFromDateString:String;
@@ -27,24 +32,55 @@ export class MyChartComponent implements OnInit {
   minDate = { year: 2015, month: 1, day: 1 };
   startDate = { year: 2015, month: 1, day: 1,};
   selectedDate: NgbDate;
+  mySub: Subscription;
 
   dateSelect = new EventEmitter<NgbDateStruct>();
   constructor(
     private domainAPIService: DomainAPIService,
     config: NgbModalConfig,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private cWEAPIService: CWEAPIService
   ) {
     config.backdrop = 'static';
     config.keyboard = false;
 
     this.domainAPIService.getDomains();
+    //this.cWEAPIService.waitCWE();
+    // this.mySub = timer(3000, 10000).subscribe((func => {
+    //   console.log("yess");
+      
+    this.icwe=this.cWEAPIService.getCWE();
+    
+    
+    
+    // }))
+    
+    
   }
 
   ngOnInit(): void {
     setTimeout(() => {
       // console.log(this.domainAPIService.getMyTest());
       this.idomains = this.domainAPIService.getDomains();
+      this.icwe=this.cWEAPIService.getCWE();
+      //this.cWEAPIService.unscribeJson();
+      //this.icwe=this.cWEAPIService.waitCWE();
+
+      
+    
+    
     }, 500);
+
+    setInterval(() => {
+      console.log("yes");
+      
+      this.icwe=this.cWEAPIService.getCWE();
+      //this.cWEAPIService.unscribeJson();
+      console.log(this.icwe);
+      
+    }, 30000);
+
+   
   }
 
   canvas: any;

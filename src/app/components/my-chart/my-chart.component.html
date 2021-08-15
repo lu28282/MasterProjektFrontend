@@ -3,7 +3,7 @@
     <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
         <button class="btn btn-outline-primary" ngbDropdownToggle>Menü</button>
         <div class="dropdown-menu" ngbDropdownMenu>
-            <li class="dropdown-submenu"><a class="dropdown-item" href="#">Schwachstellen-Typen</a>
+            <!-- <li class="dropdown-submenu"><a class="dropdown-item" href="#">Schwachstellen-Typen</a>
                 <ul class="dropdown-menu">
                     <li class="dropdown-item"><a href="#">4th level</a></li>
                     <ul class="dropdown-menu">
@@ -13,9 +13,14 @@
                     <li class="dropdown-item"><a href="#">4th level</a></li>
                     <li class="dropdown-item"><a href="#">4th level</a></li>
                 </ul>
+            </li> -->
+
+            <li class="dropdown-submenu"><a class="dropdown-item" href="#">CWE</a>
+                <ul class="dropdown-menu scrollable-menu" *ngIf="icwe">
+                    <li *ngFor="let item of icwe" class="dropdown-item" id={{item.cwe}}><a id={{item.cwe}} href="#">{{item.cwe}}</a></li>
+                </ul>
+
             </li>
-
-
 
             <li class="dropdown-submenu"><a class="dropdown-item" href="#">Land</a>
                 <ul class="dropdown-menu scrollable-menu" *ngIf="idomains">
@@ -40,7 +45,7 @@
                 </ul>
             </li>
 
-            <li class="dropdown-submenu">
+            <!-- <li class="dropdown-submenu">
                 <a class="dropdown-item" href="#">Even More..</a>
                 <ul class="dropdown-menu">
 
@@ -53,7 +58,7 @@
                     </li>
 
                 </ul>
-            </li>
+            </li> -->
 
         </div>
     </div>
