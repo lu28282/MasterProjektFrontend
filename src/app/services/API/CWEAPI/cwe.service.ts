@@ -41,8 +41,8 @@ export class CWEAPIService{
   getCWEVulability(cweVulabilityArray: any) {
     let cweArr = [];
 
-    for (let i = 0; i < cweVulabilityArray['vul'].length; i++) {
-      let currentCWE = cweVulabilityArray['vul'][i];
+    for (let i = 0; i < cweVulabilityArray.length; i++) {
+      let currentCWE = cweVulabilityArray[i];
 
       const ICWE: ICWE = {
         cwe: currentCWE,
@@ -82,8 +82,8 @@ export class CWEAPIService{
 
   getHTTP()  {
     //hit the api and get josn string or error
-    return this.http.get("C:\Users\barto\Downloads\cwe.json").forEach(element => {
-      console.log("Hier bin ich");
+    return this.http.get("http://localhost:8080/api/student/get").forEach(element => {
+      console.log(element);
       this.iCWE = this.getCWEVulability(element);
       
       console.log(element);
