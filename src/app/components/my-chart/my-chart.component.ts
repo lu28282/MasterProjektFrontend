@@ -59,6 +59,7 @@ export class MyChartComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.icwe=this.cWEAPIService.getCWE();
     setTimeout(() => {
       // console.log(this.domainAPIService.getMyTest());
       this.idomains = this.domainAPIService.getDomains();
@@ -75,7 +76,7 @@ export class MyChartComponent implements OnInit {
       console.log("yes");
       
       this.icwe=this.cWEAPIService.getCWE();
-      //this.cWEAPIService.unscribeJson();
+      // this.cWEAPIService.unscribeJson();
       console.log(this.icwe);
       
     }, 30000);

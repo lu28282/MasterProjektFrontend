@@ -14,13 +14,15 @@ import { Observable, Subscription} from 'rxjs';
 export class CWEAPIService{
   iCWE: ICWE[];
   subscribe: Subscription;
+  cweFromJson$: Observable<ICWE[]>;
   // mySub: Subscription;
 
   constructor(private http: HttpClient) {}
  
 
   getCWE() {
-  //this.getJsonSubscribe();
+  // this.getJsonSubscribe();
+ 
   this.getHTTP();
  
 
@@ -34,7 +36,6 @@ export class CWEAPIService{
     //   }).unsubscribe();
 
    
-
     return this.iCWE;
   }
 
@@ -49,8 +50,14 @@ export class CWEAPIService{
       };
 
       cweArr.push(ICWE);
+      
     }
-    //this.unscribeJson();
+    
+    // this.unscribeJson();
+    
+    
+    
+    
 
     return cweArr;
   }
@@ -66,14 +73,16 @@ export class CWEAPIService{
 
   getJsonSubscribe(){
     this.subscribe= this.http
-    .get('./assets/cwe.json')
+    .get("http://localhost:8080/api/student/get")
 
     .subscribe((data) => {
-      console.log("api "+ data);
+      
       
       this.iCWE = this.getCWEVulability(data);
       
     });
+
+   
     
   }
   unscribeJson(){
@@ -83,7 +92,7 @@ export class CWEAPIService{
   getHTTP()  {
     //hit the api and get josn string or error
     return this.http.get("http://localhost:8080/api/student/get").forEach(element => {
-      console.log(element);
+     
       this.iCWE = this.getCWEVulability(element);
       
       console.log(element);
