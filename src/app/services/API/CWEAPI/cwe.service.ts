@@ -21,9 +21,9 @@ export class CWEAPIService{
  
 
   getCWE() {
-  // this.getJsonSubscribe();
+  this.getJsonSubscribe();
  
-  this.getHTTP();
+  //this.getHTTP();
  
 
     // this.http
@@ -52,8 +52,8 @@ export class CWEAPIService{
       cweArr.push(ICWE);
       
     }
-    
-    // this.unscribeJson();
+    this.iCWE=cweArr;
+    //this.unscribeJson();
     
     
     
@@ -72,10 +72,11 @@ export class CWEAPIService{
   // }
 
   getJsonSubscribe(){
-    this.subscribe= this.http
+    return this.subscribe= this.http
     .get("http://localhost:8080/api/student/get")
 
     .subscribe((data) => {
+      console.log(data);
       
       
       this.iCWE = this.getCWEVulability(data);
@@ -95,9 +96,16 @@ export class CWEAPIService{
      
       this.iCWE = this.getCWEVulability(element);
       
-      console.log(element);
+      
       
     });
 
+    
+
 }
+
+getVulnerability(){
+  return this.iCWE;
+}
+
 }

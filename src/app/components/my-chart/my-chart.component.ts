@@ -49,7 +49,7 @@ export class MyChartComponent implements OnInit {
     // this.mySub = timer(3000, 10000).subscribe((func => {
     //   console.log("yess");
       
-    this.icwe=this.cWEAPIService.getCWE();
+    //this.cWEAPIService.getCWE();
     
     
     
@@ -73,13 +73,26 @@ export class MyChartComponent implements OnInit {
     }, 500);
 
     setInterval(() => {
-      console.log("yes");
+    console.log("setInterval");
+    
       
       this.icwe=this.cWEAPIService.getCWE();
+      this.icwe=this.cWEAPIService.getVulnerability();
       // this.cWEAPIService.unscribeJson();
-      console.log(this.icwe);
+     
       
     }, 30000);
+
+    setInterval(() => {
+      console.log("setInterval2");
+      
+        
+        
+        this.icwe=this.cWEAPIService.getVulnerability();
+        // this.cWEAPIService.unscribeJson();
+       
+        
+      }, 40000);
 
    
   }
