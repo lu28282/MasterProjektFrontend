@@ -1,43 +1,18 @@
 import { ICWE } from './../../../interfaces/cwe';
-import { Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subscription} from 'rxjs';
-// import { interval } from 'rxjs';
-
-// import 'rxjs/add/Observable/interval';
-// import 'rxjs/add/operators/mergeMap';
-// import 'rxjs/add/operators/takeWhile';
+import { Observable, Subscription } from 'rxjs';
+import { take, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CWEAPIService{
+export class CWEAPIService {
   iCWE: ICWE[];
   subscribe: Subscription;
   cweFromJson$: Observable<ICWE[]>;
-  // mySub: Subscription;
 
   constructor(private http: HttpClient) {}
- 
-
-  getCWE() {
-  this.getJsonSubscribe();
- 
-  //this.getHTTP();
- 
-
-    // this.http
-    //   .get('./assets/cwe.json')
-
-    //   .subscribe((data) => {
-    //     console.log("api "+ data);
-        
-    //     this.iCWE = this.getCWEVulability(data);
-    //   }).unsubscribe();
-
-   
-    return this.iCWE;
-  }
 
   getCWEVulability(cweVulabilityArray: any) {
     let cweArr = [];
@@ -50,62 +25,19 @@ export class CWEAPIService{
       };
 
       cweArr.push(ICWE);
-      
     }
-    this.iCWE=cweArr;
-    //this.unscribeJson();
-    
-    
-    
-    
 
     return cweArr;
   }
 
-  // waitCWE() {
-  //   this.mySub = timer(3000, 10000000000000).subscribe((func) => {
-  //     console.log('yess');
-
-  //     this.getCWE();
-  //   });
-  //   return this.iCWE;
-  // }
-
-  getJsonSubscribe(){
-    return this.subscribe= this.http
-    .get("http://localhost:8080/api/student/get")
-
-    .subscribe((data) => {
-      console.log(data);
-      
-      
-      this.iCWE = this.getCWEVulability(data);
-      
-    });
-
-   
-    
+  getCWEJsonSubscribe() {
+    return this.http
+      .get('http://localhost:8080/api/student/get')
+      .pipe(take(1))
+      .pipe(
+        map((action) => {
+          return this.getCWEVulability(action);
+        })
+      );
   }
-  unscribeJson(){
-    this.subscribe.unsubscribe();
-  }
-
-  getHTTP()  {
-    //hit the api and get josn string or error
-    return this.http.get("http://localhost:8080/api/student/get").forEach(element => {
-     
-      this.iCWE = this.getCWEVulability(element);
-      
-      
-      
-    });
-
-    
-
-}
-
-getVulnerability(){
-  return this.iCWE;
-}
-
 }

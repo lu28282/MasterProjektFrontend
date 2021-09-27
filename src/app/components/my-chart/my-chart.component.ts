@@ -12,6 +12,7 @@ import { CWEAPIService } from 'src/app/services/API/CWEAPI/cwe.service';
 import { ICWE } from 'src/app/interfaces/cwe';
 import { IDomains } from 'src/app/interfaces/domains';
 import { interval, Subscription, timer } from 'rxjs';
+import { take, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-my-chart',
@@ -22,15 +23,15 @@ export class MyChartComponent implements OnInit {
   idomains: IDomains[];
   icwe: ICWE[];
   titel: String;
-  startFromDate:Date;
-  startFromDateString:String;
-  minToDate:Date;
-  minToDateString:String;
+  startFromDate: Date;
+  startFromDateString: String;
+  minToDate: Date;
+  minToDateString: String;
   startDateFrom: Date;
   countryCode: String;
 
   minDate = { year: 2015, month: 1, day: 1 };
-  startDate = { year: 2015, month: 1, day: 1,};
+  startDate = { year: 2015, month: 1, day: 1 };
   selectedDate: NgbDate;
   mySub: Subscription;
 
@@ -45,56 +46,25 @@ export class MyChartComponent implements OnInit {
     config.keyboard = false;
 
     this.domainAPIService.getDomains();
-    //this.cWEAPIService.waitCWE();
-    // this.mySub = timer(3000, 10000).subscribe((func => {
-    //   console.log("yess");
-      
-    //this.cWEAPIService.getCWE();
-    
-    
-    
-    // }))
-    
-    
   }
 
   ngOnInit(): void {
-    this.icwe=this.cWEAPIService.getCWE();
-    setTimeout(() => {
-      // console.log(this.domainAPIService.getMyTest());
-      this.idomains = this.domainAPIService.getDomains();
-      this.icwe=this.cWEAPIService.getCWE();
-      //this.cWEAPIService.unscribeJson();
-      //this.icwe=this.cWEAPIService.waitCWE();
+    this.cWEAPIService
+      .getCWEJsonSubscribe()
+      .pipe(take(1))
+      .subscribe((res) => {
+        this.icwe = res;
+      });
 
-      
-    
-    
+    setTimeout(() => {
+      this.idomains = this.domainAPIService.getDomains();
     }, 500);
 
     setInterval(() => {
-    console.log("setInterval");
-    
-      
-      this.icwe=this.cWEAPIService.getCWE();
-      this.icwe=this.cWEAPIService.getVulnerability();
-      // this.cWEAPIService.unscribeJson();
-     
-      
-    }, 30000);
-
-    setInterval(() => {
-      console.log("setInterval2");
-      
-        
-        
-        this.icwe=this.cWEAPIService.getVulnerability();
-        // this.cWEAPIService.unscribeJson();
-       
-        
-      }, 40000);
-
-   
+      this.cWEAPIService.getCWEJsonSubscribe().subscribe((res) => {
+        this.icwe = res;
+      });
+    }, 15000);
   }
 
   canvas: any;
@@ -159,7 +129,7 @@ export class MyChartComponent implements OnInit {
     //Get domains
     var value = idAttr.nodeValue;
 
-    this.countryCode=value;
+    this.countryCode = value;
 
     var country = event.srcElement.innerText;
     this.titel = country;
@@ -167,40 +137,53 @@ export class MyChartComponent implements OnInit {
   }
 
   sendToBackend() {
-
-    if(this.startFromDate.getTime()<=this.minToDate.getTime()){
-      console.log(this.startFromDateString+"&"+this.minToDateString+"&"+"countrycode="+this.countryCode);
+    if (this.startFromDate.getTime() <= this.minToDate.getTime()) {
+      console.log(
+        this.startFromDateString +
+          '&' +
+          this.minToDateString +
+          '&' +
+          'countrycode=' +
+          this.countryCode
+      );
       this.modalService.dismissAll('Dismissed after saving data');
     }
-   
   }
-
 
   dateNavigateFrom($event: NgbDatepickerNavigateEvent) {
-    this.startFromDate=new Date($event.next.year,$event.next.month-1);
-   
-   
-    if(($event.next.month)<10){
-      this.startFromDateString="?startdate="+this.startFromDate.getFullYear()+"0"+($event.next.month).toString();
-    }else{
-      this.startFromDateString="?startdate="+this.startFromDate.getFullYear()+($event.next.month).toString();
+    this.startFromDate = new Date($event.next.year, $event.next.month - 1);
+
+    if ($event.next.month < 10) {
+      this.startFromDateString =
+        '?startdate=' +
+        this.startFromDate.getFullYear() +
+        '0' +
+        $event.next.month.toString();
+    } else {
+      this.startFromDateString =
+        '?startdate=' +
+        this.startFromDate.getFullYear() +
+        $event.next.month.toString();
     }
-     
-    
   }
   dateNavigateTo($event: NgbDatepickerNavigateEvent) {
-    this.minToDate=new Date($event.next.year,$event.next.month-1);
+    this.minToDate = new Date($event.next.year, $event.next.month - 1);
 
-    if(($event.next.month)<10){
-      this.minToDateString="?enddate="+this.minToDate.getFullYear()+"0"+($event.next.month).toString();
-    }else{
-      this.minToDateString="?enddate="+this.minToDate.getFullYear()+($event.next.month).toString();
+    if ($event.next.month < 10) {
+      this.minToDateString =
+        '?enddate=' +
+        this.minToDate.getFullYear() +
+        '0' +
+        $event.next.month.toString();
+    } else {
+      this.minToDateString =
+        '?enddate=' +
+        this.minToDate.getFullYear() +
+        $event.next.month.toString();
     }
-    
   }
 
-  compareDate(){
-    return !(this.startFromDate.getTime()<=this.minToDate.getTime());
+  compareDate() {
+    return !(this.startFromDate.getTime() <= this.minToDate.getTime());
   }
-  
 }

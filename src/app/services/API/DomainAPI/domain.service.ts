@@ -1,33 +1,24 @@
 import { IDomains } from './../../../interfaces/domains';
-import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
 
 @Injectable({
   providedIn: 'root',
 })
 export class DomainAPIService {
-  
   idomains: IDomains[];
 
   constructor(private http: HttpClient) {}
 
   getDomains() {
-    //this.domainsFromCSV$=this.readCsvData();
-    //return this.domainsFromCSV$;
-
     this.http
       .get('./assets/tld2.csv', { responseType: 'text' as 'json' })
       .subscribe((data) => {
         let csvRecordsArray = data.toString().split(/\r\n|\n/);
-        // this.domainsFromCSV$ = new Observable<IDomains[]>(csvRecordsArray) ;
-        this.idomains= this.getDataRecordsArrayFromCSVFile(csvRecordsArray);
-        
-        
+        this.idomains = this.getDataRecordsArrayFromCSVFile(csvRecordsArray);
       });
 
-      return this.idomains;
+    return this.idomains;
   }
 
   getDataRecordsArrayFromCSVFile(csvRecordsArray: any) {
@@ -43,9 +34,7 @@ export class DomainAPIService {
 
       csvArr.push(iDomains);
     }
-    
+
     return csvArr;
   }
-
- 
 }
