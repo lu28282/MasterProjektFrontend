@@ -36,8 +36,6 @@ export class MyChartComponent implements OnInit {
   selectedDate: NgbDate;
   mySub: Subscription;
 
- 
-
   dateSelect = new EventEmitter<NgbDateStruct>();
   jakobTestinHTML: any[][];
   constructor(
@@ -60,8 +58,7 @@ export class MyChartComponent implements OnInit {
     //   .subscribe((res) => {
     //     this.icwe = res;
     //   });
-    
-    
+
     setTimeout(() => {
       this.idomains = this.domainAPIService.getDomains();
     }, 500);
@@ -106,15 +103,15 @@ export class MyChartComponent implements OnInit {
         this.minToDateString +
         '&' +
         'countryCode=' +
-        this.countryCode.replace('.', '')
-        this.editDomainVulberabilityAmount(url)
+        this.countryCode.replace('.', '');
+      this.editDomainVulberabilityAmount(url);
 
       this.modalService.dismissAll('Dismissed after saving data');
       this.modalService.open(contentDomain);
     }
   }
 
-  editDomainVulberabilityAmount(url: string){
+  editDomainVulberabilityAmount(url: string) {
     this.domainVulnerability.getDomainVulnerability(url).subscribe((res) => {
       if (res) {
         let domainVulner = [];
@@ -136,17 +133,14 @@ export class MyChartComponent implements OnInit {
           domainVulner.push(idomainsVulnerability);
         }
 
-       
-
         let date = [];
         let amount = [];
         for (let i = 0; i < domainVulner.length; i++) {
           date.push(domainVulner[i].date);
           amount.push(domainVulner[i].amount);
         }
-        
+
         this.updateChartDomainVulberabilityAmount(date, amount);
-      
       }
     });
   }
@@ -199,10 +193,10 @@ export class MyChartComponent implements OnInit {
         labels: date,
         datasets: [
           {
-            label: "Anzahl der Vulberability aller Domains von "+ this.titel,
+            label: 'Anzahl der Vulberability aller Domains von ' + this.titel,
             data: amount,
-            backgroundColor: "#33AEEF",
-            borderColor: "#000000",
+            backgroundColor: '#33AEEF',
+            borderColor: '#000000',
             borderWidth: 1,
           },
         ],
