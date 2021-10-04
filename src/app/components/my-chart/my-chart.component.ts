@@ -37,7 +37,8 @@ export class MyChartComponent implements OnInit {
   mySub: Subscription;
 
   dateSelect = new EventEmitter<NgbDateStruct>();
-  jakobTestinHTML: any[][];
+  canvas: any;
+  ctx: any;
   constructor(
     private domainAPIService: DomainAPIService,
     config: NgbModalConfig,
@@ -58,6 +59,10 @@ export class MyChartComponent implements OnInit {
     //   .subscribe((res) => {
     //     this.icwe = res;
     //   });
+    
+    
+    
+    
 
     setTimeout(() => {
       this.idomains = this.domainAPIService.getDomains();
@@ -70,8 +75,6 @@ export class MyChartComponent implements OnInit {
     // }, 15000);
   }
 
-  canvas: any;
-  ctx: any;
   @ViewChild('mychart') mychart: any;
 
   ngAfterViewInit() {
@@ -126,17 +129,32 @@ export class MyChartComponent implements OnInit {
             .split(':');
 
           const idomainsVulnerability = {
-            date: currentArray[0],
+            
+            
+            date: new Date(currentArray[0]),
             amount: currentArray[1],
           };
 
           domainVulner.push(idomainsVulnerability);
         }
-
+        domainVulner.sort((a, b) => a.date - b.date);
         let date = [];
         let amount = [];
         for (let i = 0; i < domainVulner.length; i++) {
-          date.push(domainVulner[i].date);
+          
+          let month=null;
+          let year= domainVulner[i].date.getFullYear()
+          if((domainVulner[i].date.getMonth()+1)<10){
+            month =(0).toString()+(domainVulner[i].date.getMonth()+1);
+            console.log((domainVulner[i].date.getMonth()+1)+"=="+month);
+            
+          }else{
+            month =domainVulner[i].date.getMonth()+1;
+            console.log((domainVulner[i].date.getMonth()+1)+"=="+month);
+
+          }
+          //let month = domainVulner[i].date.getMonth()+1;
+          date.push(year+"-"+month);
           amount.push(domainVulner[i].amount);
         }
 
@@ -187,6 +205,9 @@ export class MyChartComponent implements OnInit {
   }
 
   updateChartDomainVulberabilityAmount(date, amount) {
+    
+  
+    
     var ctx = new Chart(this.ctx, {
       type: 'bar',
       data: {

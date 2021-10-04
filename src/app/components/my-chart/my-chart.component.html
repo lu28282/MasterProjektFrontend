@@ -71,19 +71,21 @@
     <div class="modal-header">
         <h4 class="modal-title" id="modal-basic-title">{{titel}}</h4>
         <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-        <span aria-hidden="true">&times;</span>
-      </button>
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
     <div class="modal-body">
         <!-- <p>Hello, World!</p> -->
         <!-- <ngb-datepicker #dp [outsideDays]="outsideDays"></ngb-datepicker> -->
         <div>
             <h2>Von</h2>
-            <ngb-datepicker (navigate)="dateNavigateFrom($event)" [minDate]="minDate" [startDate]="startDate"></ngb-datepicker>
+            <ngb-datepicker (navigate)="dateNavigateFrom($event)" [minDate]="minDate" [startDate]="startDate">
+            </ngb-datepicker>
         </div>
         <div>
             <h2>Bis</h2>
-            <ngb-datepicker [minDate]="minDate" [startDate]="startDate" (navigate)="dateNavigateTo($event)"></ngb-datepicker>
+            <ngb-datepicker [minDate]="minDate" [startDate]="startDate" (navigate)="dateNavigateTo($event)">
+            </ngb-datepicker>
         </div>
 
 
