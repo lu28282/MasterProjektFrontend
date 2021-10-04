@@ -91,6 +91,24 @@
 
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-outline-dark" (click)="sendToBackend()" [disabled]="compareDate()">Senden</button>
+        <button type="button" class="btn btn-outline-dark" (click)="sendToBackendDomainVulberabilityAmount($event, contentDomain)" [disabled]="compareDate()">Senden</button>
     </div>
+
+
+</ng-template>
+
+<ng-template #contentDomain>
+    <div class="modal-header">
+
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+
+            </div>
+            <P>Bitten haben Sie einen Moment Gedult</P>
+        </div>
+    </div>
+
+
+
 </ng-template>

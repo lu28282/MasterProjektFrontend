@@ -13,6 +13,7 @@ import { ICWE } from 'src/app/interfaces/cwe';
 import { IDomains } from 'src/app/interfaces/domains';
 import { interval, Subscription, timer } from 'rxjs';
 import { take, map } from 'rxjs/operators';
+import { DomainVulnerabilityAPIService } from 'src/app/services/API/DomainVulnerabilityAPI/domainVulnerability.service';
 
 @Component({
   selector: 'app-my-chart',
@@ -35,12 +36,16 @@ export class MyChartComponent implements OnInit {
   selectedDate: NgbDate;
   mySub: Subscription;
 
+ 
+
   dateSelect = new EventEmitter<NgbDateStruct>();
+  jakobTestinHTML: any[][];
   constructor(
     private domainAPIService: DomainAPIService,
     config: NgbModalConfig,
     private modalService: NgbModal,
-    private cWEAPIService: CWEAPIService
+    private cWEAPIService: CWEAPIService,
+    private domainVulnerability: DomainVulnerabilityAPIService
   ) {
     config.backdrop = 'static';
     config.keyboard = false;
@@ -49,22 +54,23 @@ export class MyChartComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.cWEAPIService
-      .getCWEJsonSubscribe()
-      .pipe(take(1))
-      .subscribe((res) => {
-        this.icwe = res;
-      });
-
+    // this.cWEAPIService
+    //   .getCWEJsonSubscribe()
+    //   .pipe(take(1))
+    //   .subscribe((res) => {
+    //     this.icwe = res;
+    //   });
+    
+    
     setTimeout(() => {
       this.idomains = this.domainAPIService.getDomains();
     }, 500);
 
-    setInterval(() => {
-      this.cWEAPIService.getCWEJsonSubscribe().subscribe((res) => {
-        this.icwe = res;
-      });
-    }, 15000);
+    // setInterval(() => {
+    //   this.cWEAPIService.getCWEJsonSubscribe().subscribe((res) => {
+    //     this.icwe = res;
+    //   });
+    // }, 15000);
   }
 
   canvas: any;
@@ -74,50 +80,6 @@ export class MyChartComponent implements OnInit {
   ngAfterViewInit() {
     this.canvas = this.mychart.nativeElement;
     this.ctx = this.canvas.getContext('2d');
-
-    var ctx = new Chart(this.ctx, {
-      type: 'bar',
-      data: {
-        labels: ['BJP', 'INC', 'AAP', 'CPI', 'CPI-M', 'NCP'],
-        datasets: [
-          {
-            label: '# of Votes',
-            data: [200, 50, 30, 15, 20, 34],
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)',
-              'rgba(54, 162, 235, 0.2)',
-              'rgba(255, 206, 86, 0.2)',
-              'rgba(75, 192, 192, 0.2)',
-              'rgba(153, 102, 255, 0.2)',
-              'rgba(255, 159, 64, 0.2)',
-            ],
-            borderColor: [
-              'rgba(255,99,132,1)',
-              'rgba(54, 162, 235, 1)',
-              'rgba(255, 206, 86, 1)',
-              'rgba(75, 192, 192, 1)',
-              'rgba(153, 102, 255, 1)',
-              'rgba(255, 159, 64, 1)',
-            ],
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        scales: {
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-              },
-            },
-          ],
-        },
-      },
-    });
-
-    ctx.data.labels = ['1', '2', '3', '4', '5'];
-    ctx.update();
   }
 
   openCountry(event, content) {
@@ -136,18 +98,57 @@ export class MyChartComponent implements OnInit {
     this.modalService.open(content);
   }
 
-  sendToBackend() {
+  sendToBackendDomainVulberabilityAmount(event, contentDomain) {
     if (this.startFromDate.getTime() <= this.minToDate.getTime()) {
-      console.log(
+      let url =
         this.startFromDateString +
-          '&' +
-          this.minToDateString +
-          '&' +
-          'countrycode=' +
-          this.countryCode
-      );
+        '&' +
+        this.minToDateString +
+        '&' +
+        'countryCode=' +
+        this.countryCode.replace('.', '')
+        this.editDomainVulberabilityAmount(url)
+
       this.modalService.dismissAll('Dismissed after saving data');
+      this.modalService.open(contentDomain);
     }
+  }
+
+  editDomainVulberabilityAmount(url: string){
+    this.domainVulnerability.getDomainVulnerability(url).subscribe((res) => {
+      if (res) {
+        let domainVulner = [];
+        let amountOfArray = res.toString().split(',');
+
+        for (let i = 0; i < amountOfArray.length; i++) {
+          let currentArray = amountOfArray[i]
+            .replace('{', '')
+            .replace('}', '')
+            .replace('"', '')
+            .replace('"', '')
+            .split(':');
+
+          const idomainsVulnerability = {
+            date: currentArray[0],
+            amount: currentArray[1],
+          };
+
+          domainVulner.push(idomainsVulnerability);
+        }
+
+       
+
+        let date = [];
+        let amount = [];
+        for (let i = 0; i < domainVulner.length; i++) {
+          date.push(domainVulner[i].date);
+          amount.push(domainVulner[i].amount);
+        }
+        
+        this.updateChartDomainVulberabilityAmount(date, amount);
+      
+      }
+    });
   }
 
   dateNavigateFrom($event: NgbDatepickerNavigateEvent) {
@@ -155,14 +156,16 @@ export class MyChartComponent implements OnInit {
 
     if ($event.next.month < 10) {
       this.startFromDateString =
-        '?startdate=' +
+        'startDate=' +
         this.startFromDate.getFullYear() +
+        '_' +
         '0' +
         $event.next.month.toString();
     } else {
       this.startFromDateString =
-        '?startdate=' +
+        'startDate=' +
         this.startFromDate.getFullYear() +
+        '_' +
         $event.next.month.toString();
     }
   }
@@ -171,19 +174,53 @@ export class MyChartComponent implements OnInit {
 
     if ($event.next.month < 10) {
       this.minToDateString =
-        '?enddate=' +
+        'endDate=' +
         this.minToDate.getFullYear() +
+        '_' +
         '0' +
         $event.next.month.toString();
     } else {
       this.minToDateString =
-        '?enddate=' +
+        'endDate=' +
         this.minToDate.getFullYear() +
+        '_' +
         $event.next.month.toString();
     }
   }
 
   compareDate() {
     return !(this.startFromDate.getTime() <= this.minToDate.getTime());
+  }
+
+  updateChartDomainVulberabilityAmount(date, amount) {
+    var ctx = new Chart(this.ctx, {
+      type: 'bar',
+      data: {
+        labels: date,
+        datasets: [
+          {
+            label: "Anzahl der Vulberability aller Domains von "+ this.titel,
+            data: amount,
+            backgroundColor: "#33AEEF",
+            borderColor: "#000000",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          yAxes: [
+            {
+              ticks: {
+                beginAtZero: true,
+              },
+            },
+          ],
+        },
+      },
+    });
+
+    ctx.update();
+    this.modalService.dismissAll('Dismissed after saving data');
   }
 }
