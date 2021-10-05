@@ -31,14 +31,15 @@ export class MyChartComponent implements OnInit {
   startDateFrom: Date;
   countryCode: String;
 
-  minDate = { year: 2015, month: 1, day: 1 };
-  startDate = { year: 2015, month: 1, day: 1 };
+  minDate = { year: 2016, month: 1, day: 1 };
+  startDate = { year: 2016, month: 1, day: 1 };
   selectedDate: NgbDate;
   mySub: Subscription;
 
   dateSelect = new EventEmitter<NgbDateStruct>();
   canvas: any;
   ctx: any;
+  myChart: Chart;
   constructor(
     private domainAPIService: DomainAPIService,
     config: NgbModalConfig,
@@ -59,10 +60,6 @@ export class MyChartComponent implements OnInit {
     //   .subscribe((res) => {
     //     this.icwe = res;
     //   });
-    
-    
-    
-    
 
     setTimeout(() => {
       this.idomains = this.domainAPIService.getDomains();
@@ -129,8 +126,6 @@ export class MyChartComponent implements OnInit {
             .split(':');
 
           const idomainsVulnerability = {
-            
-            
             date: new Date(currentArray[0]),
             amount: currentArray[1],
           };
@@ -141,20 +136,15 @@ export class MyChartComponent implements OnInit {
         let date = [];
         let amount = [];
         for (let i = 0; i < domainVulner.length; i++) {
-          
-          let month=null;
-          let year= domainVulner[i].date.getFullYear()
-          if((domainVulner[i].date.getMonth()+1)<10){
-            month =(0).toString()+(domainVulner[i].date.getMonth()+1);
-            console.log((domainVulner[i].date.getMonth()+1)+"=="+month);
-            
-          }else{
-            month =domainVulner[i].date.getMonth()+1;
-            console.log((domainVulner[i].date.getMonth()+1)+"=="+month);
-
+          let month = null;
+          let year = domainVulner[i].date.getFullYear();
+          if (domainVulner[i].date.getMonth() + 1 < 10) {
+            month = (0).toString() + (domainVulner[i].date.getMonth() + 1);
+          } else {
+            month = domainVulner[i].date.getMonth() + 1;
           }
           //let month = domainVulner[i].date.getMonth()+1;
-          date.push(year+"-"+month);
+          date.push(year + '-' + month);
           amount.push(domainVulner[i].amount);
         }
 
@@ -205,10 +195,11 @@ export class MyChartComponent implements OnInit {
   }
 
   updateChartDomainVulberabilityAmount(date, amount) {
-    
-  
-    
-    var ctx = new Chart(this.ctx, {
+    if (this.myChart) {
+      this.myChart.destroy();
+    }
+
+    this.myChart = new Chart(this.ctx, {
       type: 'bar',
       data: {
         labels: date,
@@ -235,7 +226,7 @@ export class MyChartComponent implements OnInit {
       },
     });
 
-    ctx.update();
+    this.myChart.update();
     this.modalService.dismissAll('Dismissed after saving data');
   }
 }
