@@ -40,6 +40,7 @@ export class MyChartComponent implements OnInit {
   canvas: any;
   ctx: any;
   myChart: Chart;
+  cweNumber: String;
   constructor(
     private domainAPIService: DomainAPIService,
     config: NgbModalConfig,
@@ -95,7 +96,11 @@ export class MyChartComponent implements OnInit {
     this.modalService.open(content);
   }
 
-  sendToBackendDomainVulberabilityAmount(event, contentDomain) {
+  openCWE(contentCWE) {
+    this.modalService.open(contentCWE);
+  }
+
+  sendToBackendDomainVulberabilityAmount(event, contentWait) {
     if (this.startFromDate.getTime() <= this.minToDate.getTime()) {
       let url =
         this.startFromDateString +
@@ -107,7 +112,23 @@ export class MyChartComponent implements OnInit {
       this.editDomainVulberabilityAmount(url);
 
       this.modalService.dismissAll('Dismissed after saving data');
-      this.modalService.open(contentDomain);
+      this.modalService.open(contentWait);
+    }
+  }
+
+  sendToBackendCWEVulberabilityAmount(event, contentWait) {
+    if (this.startFromDate.getTime() <= this.minToDate.getTime()) {
+      let url =
+        this.startFromDateString +
+        '&' +
+        this.minToDateString +
+        '&' +
+        'cwe=CWE-' +
+        this.cweNumber;
+      this.editCWEVulnberabilityAmount(url);
+
+      this.modalService.dismissAll('Dismissed after saving data');
+      this.modalService.open(contentWait);
     }
   }
 
@@ -147,8 +168,52 @@ export class MyChartComponent implements OnInit {
           date.push(year + '-' + month);
           amount.push(domainVulner[i].amount);
         }
+        const text = 'Anzahl der vulnerability aller Domains von ' + this.titel;
 
-        this.updateChartDomainVulberabilityAmount(date, amount);
+        this.updateChart(date, amount, text);
+      }
+    });
+  }
+
+  editCWEVulnberabilityAmount(url: string) {
+    this.cWEAPIService.getCWEJsonSubscribe(url).subscribe((res) => {
+      if (res) {
+        let cWEVulner = [];
+        let amountOfArray = res.toString().split(',');
+
+        for (let i = 0; i < amountOfArray.length; i++) {
+          let currentArray = amountOfArray[i]
+            .replace('{', '')
+            .replace('}', '')
+            .replace('"', '')
+            .replace('"', '')
+            .split(':');
+
+          const icweVulnerability = {
+            date: new Date(currentArray[0]),
+            amount: currentArray[1],
+          };
+
+          cWEVulner.push(icweVulnerability);
+        }
+        cWEVulner.sort((a, b) => a.date - b.date);
+        let date = [];
+        let amount = [];
+        for (let i = 0; i < cWEVulner.length; i++) {
+          let month = null;
+          let year = cWEVulner[i].date.getFullYear();
+          if (cWEVulner[i].date.getMonth() + 1 < 10) {
+            month = (0).toString() + (cWEVulner[i].date.getMonth() + 1);
+          } else {
+            month = cWEVulner[i].date.getMonth() + 1;
+          }
+          //let month = domainVulner[i].date.getMonth()+1;
+          date.push(year + '-' + month);
+          amount.push(cWEVulner[i].amount);
+        }
+        const text = 'Anzahl der vulnerability von CWE-' + this.cweNumber;
+
+        this.updateChart(date, amount, text);
       }
     });
   }
@@ -194,7 +259,14 @@ export class MyChartComponent implements OnInit {
     return !(this.startFromDate.getTime() <= this.minToDate.getTime());
   }
 
-  updateChartDomainVulberabilityAmount(date, amount) {
+  compareDateAndCWE() {
+    return !(
+      this.cweNumber != null &&
+      this.startFromDate.getTime() <= this.minToDate.getTime()
+    );
+  }
+
+  updateChart(date, amount, text) {
     if (this.myChart) {
       this.myChart.destroy();
     }
@@ -205,7 +277,7 @@ export class MyChartComponent implements OnInit {
         labels: date,
         datasets: [
           {
-            label: 'Anzahl der Vulberability aller Domains von ' + this.titel,
+            label: text,
             data: amount,
             backgroundColor: '#33AEEF',
             borderColor: '#000000',

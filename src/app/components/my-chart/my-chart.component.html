@@ -15,10 +15,10 @@
                 </ul>
             </li> -->
 
-            <li class="dropdown-submenu"><a class="dropdown-item" href="#">CWE</a>
-                <ul class="dropdown-menu scrollable-menu" *ngIf="icwe">
+            <li><a class="dropdown-item" href="#" (click)="openCWE(contentCWE)">CWE</a>
+                <!-- <ul class="dropdown-menu scrollable-menu" *ngIf="icwe">
                     <li *ngFor="let item of icwe" class="dropdown-item" id={{item.cwe}}><a id={{item.cwe}} href="#">{{item.cwe}}</a></li>
-                </ul>
+                </ul> -->
 
             </li>
 
@@ -93,13 +93,15 @@
 
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-outline-dark" (click)="sendToBackendDomainVulberabilityAmount($event, contentDomain)" [disabled]="compareDate()">Senden</button>
+        <button type="button" class="btn btn-outline-dark" (click)="sendToBackendDomainVulberabilityAmount($event, contentWait)" [disabled]="compareDate()">Senden</button>
     </div>
 
 
 </ng-template>
 
-<ng-template #contentDomain>
+
+
+<ng-template #contentWait>
     <div class="modal-header">
 
         <div class="text-center">
@@ -107,10 +109,49 @@
                 <span class="sr-only">Loading...</span>
 
             </div>
-            <P>Bitten haben Sie einen Moment Gedult</P>
+            <P>Bitte haben Sie einen Moment Geduld</P>
         </div>
     </div>
 
+
+
+</ng-template>
+
+
+
+<ng-template #contentCWE let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">CWE-</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <!-- <p>Hello, World!</p> -->
+        <!-- <ngb-datepicker #dp [outsideDays]="outsideDays"></ngb-datepicker> -->
+
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputCWE">CWE-</span>
+            <input [(ngModel)]="cweNumber" type="number" class="form-control" id="cweNumber" required>
+        </div>
+        <div>
+            <h2>Von</h2>
+            <ngb-datepicker (navigate)="dateNavigateFrom($event)" [minDate]="minDate" [startDate]="startDate">
+            </ngb-datepicker>
+        </div>
+        <div>
+            <h2>Bis</h2>
+            <ngb-datepicker [minDate]="minDate" [startDate]="startDate" (navigate)="dateNavigateTo($event)">
+            </ngb-datepicker>
+        </div>
+
+
+
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" (click)="sendToBackendCWEVulberabilityAmount($event, contentWait)" [disabled]="compareDateAndCWE()">Senden</button>
+    </div>
 
 
 </ng-template>

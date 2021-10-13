@@ -30,14 +30,20 @@ export class CWEAPIService {
     return cweArr;
   }
 
-  getCWEJsonSubscribe() {
-    return this.http
-      .get('http://localhost:8080/api/student/get')
-      .pipe(take(1))
-      .pipe(
-        map((action) => {
-          return this.getCWEVulability(action);
-        })
-      );
+  // getCWEJsonSubscribe() {
+  //   return this.http
+  //     .get('http://localhost:8080/api/student/get')
+  //     .pipe(take(1))
+  //     .pipe(
+  //       map((action) => {
+  //         return this.getCWEVulability(action);
+  //       })
+  //     );
+  // }
+
+  getCWEJsonSubscribe(url: string) {
+    let wholeUrl = 'http://localhost:8080/CWE?' + url;
+
+    return this.http.get(wholeUrl, { responseType: 'text' as 'json' });
   }
 }
