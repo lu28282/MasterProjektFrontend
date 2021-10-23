@@ -45,5 +45,22 @@ export class CWEAPIService {
     let wholeUrl = 'http://localhost:8080/CWE?' + url;
 
     return this.http.get(wholeUrl, { responseType: 'text' as 'json' });
+  //   return this.http.get(wholeUrl).pipe(map(action=>{
+  //   const arr =[];
+  //   console.log(action["2016-01"]);
+    
+  //   for (let index = 0; action[index]; index++) {
+  //     const icweVulnerability = {
+  //       date: new Date(action[index]),
+  //       amount: currentArray[1],
+  //     };
+  //     arr.push(action[index]);
+
+      
+  //   }
+  //   console.log('Jakob arr     ', arr);
+  //   return arr;
+    
+  //   }));
   }
 }

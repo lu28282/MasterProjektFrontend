@@ -7,7 +7,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import {NgbPaginationModule, NgbAlertModule} from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientModule } from '@angular/common/http';
 import {FormsModule} from '@angular/forms'
-
+import { IonicStorageModule } from '@ionic/storage-angular';
 
 
 
@@ -23,6 +23,7 @@ import {FormsModule} from '@angular/forms'
     NgbAlertModule,
     HttpClientModule,
     FormsModule,
+    IonicStorageModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -11,9 +11,11 @@ import {
 import { CWEAPIService } from 'src/app/services/API/CWEAPI/cwe.service';
 import { ICWE } from 'src/app/interfaces/cwe';
 import { IDomains } from 'src/app/interfaces/domains';
-import { interval, Subscription, timer } from 'rxjs';
-import { take, map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { DomainVulnerabilityAPIService } from 'src/app/services/API/DomainVulnerabilityAPI/domainVulnerability.service';
+import { ExploitabilityScoreAPIService } from 'src/app/services/API/exploitabilityScoreAPI/exploitabilityScore.service';
+import { ImpactScoreAPIService } from 'src/app/services/API/ImpactScoreAPI/impactScoreAPI.service';
+
 
 @Component({
   selector: 'app-my-chart',
@@ -35,18 +37,24 @@ export class MyChartComponent implements OnInit {
   startDate = { year: 2016, month: 1, day: 1 };
   selectedDate: NgbDate;
   mySub: Subscription;
+  lowerLimit: any;
+  upperLimit: any;
 
   dateSelect = new EventEmitter<NgbDateStruct>();
   canvas: any;
   ctx: any;
   myChart: Chart;
   cweNumber: String;
+
   constructor(
     private domainAPIService: DomainAPIService,
     config: NgbModalConfig,
     private modalService: NgbModal,
     private cWEAPIService: CWEAPIService,
-    private domainVulnerability: DomainVulnerabilityAPIService
+    private domainVulnerability: DomainVulnerabilityAPIService,
+    private exploitabilityScoreAPIService: ExploitabilityScoreAPIService,
+    private impactScoreAPIService: ImpactScoreAPIService,
+    
   ) {
     config.backdrop = 'static';
     config.keyboard = false;
@@ -100,6 +108,73 @@ export class MyChartComponent implements OnInit {
     this.modalService.open(contentCWE);
   }
 
+  openImpactScore(impactScore) {
+    this.modalService.open(impactScore);
+  }
+
+  lowerLimitPattern(event) {
+    //const pattern = /[0-9.,]/;
+    // this.lowerLimit.toString();
+    // const pattern = /^\d+((.)|(.\d{0,1})?)$/;
+    // //let inputChar = event.target.value;
+    // let inputChar = event;
+    // console.log(!pattern.test(inputChar));
+
+    if (event != null) {
+      //this.lowerLimit=this.lowerLimit.replace(/[^.\d]/g, '');
+      const pattern = /^\d+((.)|(.\d{0,1})?)$/;
+      let inputChar = event;
+      if (!pattern.test(inputChar)) {
+        // const text = this.lowerLimit;
+        // const editText = text.slice(0,-1)
+        //this.lowerLimit=editText.replace(/[^.\d]/g, '');
+
+        const realNumber = (Math.round(event * 100) / 100).toFixed(1);
+        this.lowerLimit = realNumber;
+      }
+
+      if (this.lowerLimit > 10) {
+        this.lowerLimit = 10;
+      }
+
+      const realNumber = (Math.round(event * 100) / 100).toFixed(1);
+      this.lowerLimit = realNumber;
+    }
+
+    // if (!pattern.test(inputChar)) {
+    //   console.log('Jaa');
+    //   // const text = this.lowerLimit;
+    //   // const editText = text.slice(0,-1)
+    //   // let str = this.lowerLimit;
+    //   // str = str.substring(0, str.length - 1);
+    //   // console.log(str);
+
+    //   //this.lowerLimit=editText;
+    // }
+  }
+
+  upperLimitPattern(event) {
+    if (event != null) {
+      //this.lowerLimit=this.lowerLimit.replace(/[^.\d]/g, '');
+      const pattern = /^\d+((.)|(.\d{0,1})?)$/;
+      let inputChar = event;
+      if (!pattern.test(inputChar)) {
+        // const text = this.lowerLimit;
+        // const editText = text.slice(0,-1)
+        //this.lowerLimit=editText.replace(/[^.\d]/g, '');
+
+        const realNumber = (Math.round(event * 100) / 100).toFixed(1);
+        this.upperLimit = realNumber;
+      }
+      if (this.upperLimit > 10) {
+        this.upperLimit = 10;
+      }
+
+      const realNumber = (Math.round(event * 100) / 100).toFixed(1);
+      this.upperLimit = realNumber;
+    }
+  }
+
   sendToBackendDomainVulberabilityAmount(event, contentWait) {
     if (this.startFromDate.getTime() <= this.minToDate.getTime()) {
       let url =
@@ -130,6 +205,69 @@ export class MyChartComponent implements OnInit {
       this.modalService.dismissAll('Dismissed after saving data');
       this.modalService.open(contentWait);
     }
+  }
+// localhost:8080/impactScore?startDate=2016_01&endDate=2016_01&lowerLimit=2.9&upperLimit=2.9
+  sendToBackendImpactScore(event, contentWait) {
+    const compareLowerLimitWithUpperLimit =
+      Number(this.lowerLimit) <= Number(this.upperLimit);
+    if ( compareLowerLimitWithUpperLimit && this.startFromDate.getTime() <= this.minToDate.getTime()) {
+      let url =
+        this.startFromDateString +
+        '&' +
+        this.minToDateString +
+        '&' +
+        'lowerLimit=' +
+        this.lowerLimit +
+        '&' +
+        'upperLimit=' +
+        this.upperLimit;
+      this.editImpactScore(url);
+
+      this.modalService.dismissAll('Dismissed after saving data');
+      this.modalService.open(contentWait);
+    }
+  }
+  editImpactScore(url: string) {
+    this.impactScoreAPIService.getImpactScore(url).subscribe((res) => {
+      if (res) {
+        let impactScore = [];
+        let amountOfArray = res.toString().split(',');
+
+        for (let i = 0; i < amountOfArray.length; i++) {
+          let currentArray = amountOfArray[i]
+            .replace('{', '')
+            .replace('}', '')
+            .replace('"', '')
+            .replace('"', '')
+            .split(':');
+
+          const iImpactScore = {
+            date: new Date(currentArray[0]),
+            amount: currentArray[1],
+          };
+
+          impactScore.push(iImpactScore);
+        }
+        impactScore.sort((a, b) => a.date - b.date);
+        let date = [];
+        let amount = [];
+        for (let i = 0; i < impactScore.length; i++) {
+          let month = null;
+          let year = impactScore[i].date.getFullYear();
+          if (impactScore[i].date.getMonth() + 1 < 10) {
+            month = (0).toString() + (impactScore[i].date.getMonth() + 1);
+          } else {
+            month = impactScore[i].date.getMonth() + 1;
+          }
+          //let month = domainVulner[i].date.getMonth()+1;
+          date.push(year + '-' + month);
+          amount.push(impactScore[i].amount);
+        }
+        const text = 'Anzahl der Impact Score von ' + this.lowerLimit+' bis ' +this.upperLimit ;
+
+        this.updateChart(date, amount, text);
+      }
+    });
   }
 
   editDomainVulberabilityAmount(url: string) {
@@ -262,6 +400,16 @@ export class MyChartComponent implements OnInit {
   compareDateAndCWE() {
     return !(
       this.cweNumber != null &&
+      this.startFromDate.getTime() <= this.minToDate.getTime()
+    );
+  }
+
+  compareDateAndLowerLimitWithUpperLimit() {
+    const compareLowerLimitWithUpperLimit =
+      Number(this.lowerLimit) <= Number(this.upperLimit);
+
+    return !(
+      compareLowerLimitWithUpperLimit &&
       this.startFromDate.getTime() <= this.minToDate.getTime()
     );
   }
