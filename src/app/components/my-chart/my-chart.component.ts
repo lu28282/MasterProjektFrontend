@@ -16,7 +16,6 @@ import { DomainVulnerabilityAPIService } from 'src/app/services/API/DomainVulner
 import { ExploitabilityScoreAPIService } from 'src/app/services/API/exploitabilityScoreAPI/exploitabilityScore.service';
 import { ImpactScoreAPIService } from 'src/app/services/API/ImpactScoreAPI/impactScoreAPI.service';
 
-
 @Component({
   selector: 'app-my-chart',
   templateUrl: './my-chart.component.html',
@@ -53,8 +52,7 @@ export class MyChartComponent implements OnInit {
     private cWEAPIService: CWEAPIService,
     private domainVulnerability: DomainVulnerabilityAPIService,
     private exploitabilityScoreAPIService: ExploitabilityScoreAPIService,
-    private impactScoreAPIService: ImpactScoreAPIService,
-    
+    private impactScoreAPIService: ImpactScoreAPIService
   ) {
     config.backdrop = 'static';
     config.keyboard = false;
@@ -110,6 +108,9 @@ export class MyChartComponent implements OnInit {
 
   openImpactScore(impactScore) {
     this.modalService.open(impactScore);
+  }
+  openExploitabilityScore(exploitabilityScore) {
+    this.modalService.open(exploitabilityScore);
   }
 
   lowerLimitPattern(event) {
@@ -206,11 +207,14 @@ export class MyChartComponent implements OnInit {
       this.modalService.open(contentWait);
     }
   }
-// localhost:8080/impactScore?startDate=2016_01&endDate=2016_01&lowerLimit=2.9&upperLimit=2.9
+
   sendToBackendImpactScore(event, contentWait) {
     const compareLowerLimitWithUpperLimit =
       Number(this.lowerLimit) <= Number(this.upperLimit);
-    if ( compareLowerLimitWithUpperLimit && this.startFromDate.getTime() <= this.minToDate.getTime()) {
+    if (
+      compareLowerLimitWithUpperLimit &&
+      this.startFromDate.getTime() <= this.minToDate.getTime()
+    ) {
       let url =
         this.startFromDateString +
         '&' +
@@ -227,45 +231,55 @@ export class MyChartComponent implements OnInit {
       this.modalService.open(contentWait);
     }
   }
+
+  sendToBackendExploitabilityScore(event, contentWait) {
+    const compareLowerLimitWithUpperLimit =
+      Number(this.lowerLimit) <= Number(this.upperLimit);
+    if (
+      compareLowerLimitWithUpperLimit &&
+      this.startFromDate.getTime() <= this.minToDate.getTime()
+    ) {
+      let url =
+        this.startFromDateString +
+        '&' +
+        this.minToDateString +
+        '&' +
+        'lowerLimit=' +
+        this.lowerLimit +
+        '&' +
+        'upperLimit=' +
+        this.upperLimit;
+      this.editExploitabilityScore(url);
+
+      this.modalService.dismissAll('Dismissed after saving data');
+      this.modalService.open(contentWait);
+    }
+  }
+  editExploitabilityScore(url: string) {
+    this.exploitabilityScoreAPIService
+      .getExploitabilityScore(url)
+      .subscribe((res) => {
+        if (res) {
+          const text =
+            'Anzahl der Exploitability Score von ' +
+            this.lowerLimit +
+            ' bis ' +
+            this.upperLimit;
+
+          this.editingArrayForGraphic(res, text);
+        }
+      });
+  }
+
   editImpactScore(url: string) {
     this.impactScoreAPIService.getImpactScore(url).subscribe((res) => {
       if (res) {
-        let impactScore = [];
-        let amountOfArray = res.toString().split(',');
-
-        for (let i = 0; i < amountOfArray.length; i++) {
-          let currentArray = amountOfArray[i]
-            .replace('{', '')
-            .replace('}', '')
-            .replace('"', '')
-            .replace('"', '')
-            .split(':');
-
-          const iImpactScore = {
-            date: new Date(currentArray[0]),
-            amount: currentArray[1],
-          };
-
-          impactScore.push(iImpactScore);
-        }
-        impactScore.sort((a, b) => a.date - b.date);
-        let date = [];
-        let amount = [];
-        for (let i = 0; i < impactScore.length; i++) {
-          let month = null;
-          let year = impactScore[i].date.getFullYear();
-          if (impactScore[i].date.getMonth() + 1 < 10) {
-            month = (0).toString() + (impactScore[i].date.getMonth() + 1);
-          } else {
-            month = impactScore[i].date.getMonth() + 1;
-          }
-          //let month = domainVulner[i].date.getMonth()+1;
-          date.push(year + '-' + month);
-          amount.push(impactScore[i].amount);
-        }
-        const text = 'Anzahl der Impact Score von ' + this.lowerLimit+' bis ' +this.upperLimit ;
-
-        this.updateChart(date, amount, text);
+        const text =
+          'Anzahl der Impact Score von ' +
+          this.lowerLimit +
+          ' bis ' +
+          this.upperLimit;
+        this.editingArrayForGraphic(res, text);
       }
     });
   }
@@ -273,42 +287,8 @@ export class MyChartComponent implements OnInit {
   editDomainVulberabilityAmount(url: string) {
     this.domainVulnerability.getDomainVulnerability(url).subscribe((res) => {
       if (res) {
-        let domainVulner = [];
-        let amountOfArray = res.toString().split(',');
-
-        for (let i = 0; i < amountOfArray.length; i++) {
-          let currentArray = amountOfArray[i]
-            .replace('{', '')
-            .replace('}', '')
-            .replace('"', '')
-            .replace('"', '')
-            .split(':');
-
-          const idomainsVulnerability = {
-            date: new Date(currentArray[0]),
-            amount: currentArray[1],
-          };
-
-          domainVulner.push(idomainsVulnerability);
-        }
-        domainVulner.sort((a, b) => a.date - b.date);
-        let date = [];
-        let amount = [];
-        for (let i = 0; i < domainVulner.length; i++) {
-          let month = null;
-          let year = domainVulner[i].date.getFullYear();
-          if (domainVulner[i].date.getMonth() + 1 < 10) {
-            month = (0).toString() + (domainVulner[i].date.getMonth() + 1);
-          } else {
-            month = domainVulner[i].date.getMonth() + 1;
-          }
-          //let month = domainVulner[i].date.getMonth()+1;
-          date.push(year + '-' + month);
-          amount.push(domainVulner[i].amount);
-        }
         const text = 'Anzahl der vulnerability aller Domains von ' + this.titel;
-
-        this.updateChart(date, amount, text);
+        this.editingArrayForGraphic(res, text);
       }
     });
   }
@@ -316,44 +296,50 @@ export class MyChartComponent implements OnInit {
   editCWEVulnberabilityAmount(url: string) {
     this.cWEAPIService.getCWEJsonSubscribe(url).subscribe((res) => {
       if (res) {
-        let cWEVulner = [];
-        let amountOfArray = res.toString().split(',');
-
-        for (let i = 0; i < amountOfArray.length; i++) {
-          let currentArray = amountOfArray[i]
-            .replace('{', '')
-            .replace('}', '')
-            .replace('"', '')
-            .replace('"', '')
-            .split(':');
-
-          const icweVulnerability = {
-            date: new Date(currentArray[0]),
-            amount: currentArray[1],
-          };
-
-          cWEVulner.push(icweVulnerability);
-        }
-        cWEVulner.sort((a, b) => a.date - b.date);
-        let date = [];
-        let amount = [];
-        for (let i = 0; i < cWEVulner.length; i++) {
-          let month = null;
-          let year = cWEVulner[i].date.getFullYear();
-          if (cWEVulner[i].date.getMonth() + 1 < 10) {
-            month = (0).toString() + (cWEVulner[i].date.getMonth() + 1);
-          } else {
-            month = cWEVulner[i].date.getMonth() + 1;
-          }
-          //let month = domainVulner[i].date.getMonth()+1;
-          date.push(year + '-' + month);
-          amount.push(cWEVulner[i].amount);
-        }
         const text = 'Anzahl der vulnerability von CWE-' + this.cweNumber;
 
-        this.updateChart(date, amount, text);
+        this.editingArrayForGraphic(res, text);
       }
     });
+  }
+
+  editingArrayForGraphic(array, text: string) {
+    let amountOfArray = array.toString().split(',');
+
+    let newArray = [];
+
+    for (let i = 0; i < amountOfArray.length; i++) {
+      let currentArray = amountOfArray[i]
+        .replace('{', '')
+        .replace('}', '')
+        .replace('"', '')
+        .replace('"', '')
+        .split(':');
+
+      const iArray = {
+        date: new Date(currentArray[0]),
+        amount: currentArray[1],
+      };
+
+      newArray.push(iArray);
+    }
+    newArray.sort((a, b) => a.date - b.date);
+    let date = [];
+    let amount = [];
+    for (let i = 0; i < newArray.length; i++) {
+      let month = null;
+      let year = newArray[i].date.getFullYear();
+      if (newArray[i].date.getMonth() + 1 < 10) {
+        month = (0).toString() + (newArray[i].date.getMonth() + 1);
+      } else {
+        month = newArray[i].date.getMonth() + 1;
+      }
+      //let month = domainVulner[i].date.getMonth()+1;
+      date.push(year + '-' + month);
+      amount.push(newArray[i].amount);
+    }
+
+    this.updateChart(date, amount, text);
   }
 
   dateNavigateFrom($event: NgbDatepickerNavigateEvent) {
