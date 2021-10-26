@@ -9,11 +9,10 @@ import {
   NgbDatepickerNavigateEvent,
 } from '@ng-bootstrap/ng-bootstrap';
 import { CWEAPIService } from 'src/app/services/API/CWEAPI/cwe.service';
-import { ICWE } from 'src/app/interfaces/cwe';
 import { IDomains } from 'src/app/interfaces/domains';
 import { Subscription } from 'rxjs';
 import { DomainVulnerabilityAPIService } from 'src/app/services/API/DomainVulnerabilityAPI/domainVulnerability.service';
-import { ExploitabilityScoreAPIService } from 'src/app/services/API/exploitabilityScoreAPI/exploitabilityScore.service';
+import { ExploitabilityScoreAPIService } from 'src/app/services/API/ExploitabilityScoreAPI/exploitabilityScore.service';
 import { ImpactScoreAPIService } from 'src/app/services/API/ImpactScoreAPI/impactScoreAPI.service';
 
 @Component({
@@ -23,7 +22,6 @@ import { ImpactScoreAPIService } from 'src/app/services/API/ImpactScoreAPI/impac
 })
 export class MyChartComponent implements OnInit {
   idomains: IDomains[];
-  icwe: ICWE[];
   titel: String;
   startFromDate: Date;
   startFromDateString: String;

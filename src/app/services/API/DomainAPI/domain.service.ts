@@ -12,7 +12,7 @@ export class DomainAPIService {
 
   getDomains() {
     this.http
-      .get('./assets/tld2.csv', { responseType: 'text' as 'json' })
+      .get('./assets/countries.csv', { responseType: 'text' as 'json' })
       .subscribe((data) => {
         let csvRecordsArray = data.toString().split(/\r\n|\n/);
         this.idomains = this.getDataRecordsArrayFromCSVFile(csvRecordsArray);
@@ -28,7 +28,7 @@ export class DomainAPIService {
       let currentRecord = csvRecordsArray[i].split(';');
 
       const iDomains: IDomains = {
-        land: currentRecord[0],
+        country: currentRecord[0],
         domain: currentRecord[1],
       };
 

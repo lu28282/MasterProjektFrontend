@@ -40,7 +40,7 @@
 
             <li class="dropdown-submenu"><a class="dropdown-item" href="#">Land</a>
                 <ul class="dropdown-menu scrollable-menu" *ngIf="idomains">
-                    <li *ngFor="let item of idomains" class="dropdown-item" (click)="openCountry($event, content)" id={{item.domain}}><a id={{item.domain}} href="#" data-toggle="modal" data-target="#modal1">{{item.land}}</a></li>
+                    <li *ngFor="let item of idomains" class="dropdown-item" (click)="openCountry($event, content)" id={{item.domain}}><a id={{item.domain}} href="#" data-toggle="modal" data-target="#modal1">{{item.country}}</a></li>
                 </ul>
 
             </li>
