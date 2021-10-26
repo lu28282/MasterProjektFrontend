@@ -59,17 +59,17 @@ export class MyChartComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    
+    setTimeout(() => {
+      this.idomains = this.domainAPIService.getDomains();
+    }, 500);
+    
     // this.cWEAPIService
     //   .getCWEJsonSubscribe()
     //   .pipe(take(1))
     //   .subscribe((res) => {
     //     this.icwe = res;
     //   });
-
-    setTimeout(() => {
-      this.idomains = this.domainAPIService.getDomains();
-    }, 500);
-
     // setInterval(() => {
     //   this.cWEAPIService.getCWEJsonSubscribe().subscribe((res) => {
     //     this.icwe = res;
