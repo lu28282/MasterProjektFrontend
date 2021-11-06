@@ -176,7 +176,7 @@ export class MyChartComponent implements OnInit {
 
   sendToBackendDomainVulberabilityAmount(event, contentWait) {
     if (this.startFromDate.getTime() <= this.minToDate.getTime()) {
-      let url =
+      let url:string =
         this.startFromDateString +
         '&' +
         this.minToDateString +
@@ -192,7 +192,7 @@ export class MyChartComponent implements OnInit {
 
   sendToBackendCWEVulberabilityAmount(event, contentWait) {
     if (this.startFromDate.getTime() <= this.minToDate.getTime()) {
-      let url =
+      let url:string =
         this.startFromDateString +
         '&' +
         this.minToDateString +
@@ -207,13 +207,13 @@ export class MyChartComponent implements OnInit {
   }
 
   sendToBackendImpactScore(event, contentWait) {
-    const compareLowerLimitWithUpperLimit =
+    const compareLowerLimitWithUpperLimit:boolean =
       Number(this.lowerLimit) <= Number(this.upperLimit);
     if (
       compareLowerLimitWithUpperLimit &&
       this.startFromDate.getTime() <= this.minToDate.getTime()
     ) {
-      let url =
+      let url:string =
         this.startFromDateString +
         '&' +
         this.minToDateString +
@@ -231,13 +231,13 @@ export class MyChartComponent implements OnInit {
   }
 
   sendToBackendExploitabilityScore(event, contentWait) {
-    const compareLowerLimitWithUpperLimit =
+    const compareLowerLimitWithUpperLimit:boolean =
       Number(this.lowerLimit) <= Number(this.upperLimit);
     if (
       compareLowerLimitWithUpperLimit &&
       this.startFromDate.getTime() <= this.minToDate.getTime()
     ) {
-      let url =
+      let url:string =
         this.startFromDateString +
         '&' +
         this.minToDateString +
@@ -258,7 +258,7 @@ export class MyChartComponent implements OnInit {
       .getExploitabilityScore(url)
       .subscribe((res) => {
         if (res) {
-          const text =
+          const text:string =
             'Anzahl der Exploitability Score von ' +
             this.lowerLimit +
             ' bis ' +
@@ -272,7 +272,7 @@ export class MyChartComponent implements OnInit {
   editImpactScore(url: string) {
     this.impactScoreAPIService.getImpactScore(url).subscribe((res) => {
       if (res) {
-        const text =
+        const text:string =
           'Anzahl der Impact Score von ' +
           this.lowerLimit +
           ' bis ' +
@@ -285,14 +285,14 @@ export class MyChartComponent implements OnInit {
   editDomainVulberabilityAmount(url: string) {
     this.domainVulnerability.getDomainVulnerability(url).subscribe((res) => {
       if (res) {
-        const text = 'Anzahl der vulnerability aller Domains von ' + this.titel;
+        const text:string = 'Anzahl der vulnerability aller Domains von ' + this.titel;
         this.editingArrayForGraphic(res, text);
       }
     });
   }
 
   editCWEVulnberabilityAmount(url: string) {
-    this.cWEAPIService.getCWEJsonSubscribe(url).subscribe((res) => {
+    this.cWEAPIService.getCWE(url).subscribe((res) => {
       if (res) {
         const text = 'Anzahl der vulnerability von CWE-' + this.cweNumber;
 
@@ -301,8 +301,8 @@ export class MyChartComponent implements OnInit {
     });
   }
 
-  editingArrayForGraphic(array, text: string) {
-    let amountOfArray = array.toString().split(',');
+  editingArrayForGraphic(jsonString, text: string) {
+    let amountOfArray = jsonString.toString().split(',');
 
     let newArray = [];
 
@@ -322,7 +322,7 @@ export class MyChartComponent implements OnInit {
       newArray.push(iArray);
     }
     newArray.sort((a, b) => a.date - b.date);
-    let date = [];
+    let date =[];
     let amount = [];
     for (let i = 0; i < newArray.length; i++) {
       let month = null;
@@ -377,19 +377,19 @@ export class MyChartComponent implements OnInit {
     }
   }
 
-  compareDate() {
+  compareDate():boolean {
     return !(this.startFromDate.getTime() <= this.minToDate.getTime());
   }
 
-  compareDateAndCWE() {
+  compareDateAndCWE():boolean {
     return !(
       this.cweNumber != null &&
       this.startFromDate.getTime() <= this.minToDate.getTime()
     );
   }
 
-  compareDateAndLowerLimitWithUpperLimit() {
-    const compareLowerLimitWithUpperLimit =
+  compareDateAndLowerLimitWithUpperLimit():boolean {
+    const compareLowerLimitWithUpperLimit:boolean =
       Number(this.lowerLimit) <= Number(this.upperLimit);
 
     return !(
@@ -398,7 +398,7 @@ export class MyChartComponent implements OnInit {
     );
   }
 
-  updateChart(date, amount, text) {
+  updateChart(date: any[], amount: any[], text:string) {
     if (this.myChart) {
       this.myChart.destroy();
     }
